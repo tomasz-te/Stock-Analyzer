@@ -11,7 +11,7 @@ st.write("""
 The Content is for informational purposes only, you should not construe any such information or other material as investment, financial, or other advice.
 """)
 st.title("""
-Automatic technical analyzer of stock exchange stocks.
+Automatic technical analyzer of S&P500 stocks.
 """)
 ticker = st.selectbox("Select stock", list_of_stocks)
 
