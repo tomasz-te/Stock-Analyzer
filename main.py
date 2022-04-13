@@ -6,24 +6,26 @@ import pandas_ta as ta
 
 dfs = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")
 list_of_stocks = dfs[0].Symbol
-list_of_stocks.head()
 
-len(list_of_stocks)
 st.write("""
 The Content is for informational purposes only, you should not construe any such information or other material as investment, financial, or other advice.
 """)
+st.title("""
+Automatic technical analyzer of stock exchange stocks.
+""")
 ticker = st.selectbox("Select stock", list_of_stocks)
-ticker
 
 stock = yf.Ticker(ticker)
-stock.history().head(3)
-# stock.earnings
 stock_name = stock.info['longName']
 
-period = "1y"
-interval = "1d"
+ranges = [("1y","1d"),("3mo","1h"),("1d","1m")]
+range = st.selectbox("Select 'period' and 'interval'", ranges)
+
+period = range[0]
+interval = range[1]
 # valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
 # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+# 1y + 1d, 3mo + 1h, 1d + 1m
 
 stock_price = stock.history(period=period, interval=interval).drop(['Stock Splits', 'Dividends'], axis=1)
 
@@ -185,13 +187,17 @@ def stock_recommendation(stock):
 
 recommendation = stock_recommendation(stock_price)
 st.write("Results from individual sub-strategies (-1 = sell, 0 = neutral, 1 = buy): ")
-for i in range(len(names)):
-    st.write(names[i], recommendation[i])
-st.write("Final reccomendation score: ", sum(recommendation))
+# for i in range(len(names)):
+#     st.write(names[i], recommendation[i])
+i = 0
+while i < len(names):
+    st.write(names[i], recommendation[i], end =" ")
+    i += 1
+st.write("Final recommendation score: ", sum(recommendation))
 
 if sum(recommendation) >= 1:
-    st.write("You can consider buying this stock.")
+    st.success("You can consider buying this stock.")
 elif sum(recommendation) <= -1:
-    st.write("You can consider short selling this stock")
+    st.error("You can consider short selling this stock")
 else:
-    st.write("Signal is neutral. You can consider looking for a better alternative.")
+    st.info("Signal is neutral. You can consider looking for a better alternative.")
